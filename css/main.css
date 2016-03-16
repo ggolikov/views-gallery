@@ -5,42 +5,10 @@ body {
   float: none;
   width: auto;
 }
-h1 {
-  font-size: 20px;
-  color: red;
-  font-family: arial;
-  color: white;
-  text-align: center;
-}
 
-.top {
-  min-width: 250px;
-  width: auto;
-  height: 10%;
-  min-height: 110px;
-  background-color: #0E0E0E;
-}
-table {
-  width: 100%;
-  height: 80%;
-}
-tbody {
-  width: 100%;
-  height: 80%;
-}
-#first-city {
-  width:  40%;
-  margin-left:  30%;
-  margin-right: 30%;
-}
-#second-city {
-  width:  40%;
-  margin-left:  30%;
-  margin-right: 30%;
-}
 .map {
   width:auto;
-  height: 85%;
+  height: 100%;
   min-height: 300px;
 }
 .autocomplete-suggestions {
