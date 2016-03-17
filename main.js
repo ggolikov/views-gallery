@@ -75,10 +75,19 @@ buildings.once("data:loaded", function(){
     for (var j = 1; j < pointsArray[i].length; j++) {
       var line = L.polyline([pointsArray[i][j-1], pointsArray[i][j]]);
       var clothest = L.GeometryUtil.closest(map, line, centerArray[i]);
+      if (clothest.lat !== line._latlngs[0].lat &&
+          clothest.lng !== line._latlngs[0].lng ||
+          clothest.lat !== line._latlngs[1].lat &&
+          clothest.lng !== line._latlngs[1].lng) {
       L.circleMarker(clothest, circleStyle3).addTo(map);
-      // console.log(clothest);
-      // console.log(centerArray[i]);
+      var Geodesic = L.geodesic([], {
+          weight: 1.5,
+          opacity: 0.7,
+          color: 'yellow',
+          steps: 50
+      }).addTo(map);
       Geodesic.setLatLngs([[centerArray[i], clothest]]);
+    }
     }
   }
 }, buildings);
