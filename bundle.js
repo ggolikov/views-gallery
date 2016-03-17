@@ -20,7 +20,7 @@ var buildingsStyle = {
   fillOpacity: 0
 };
 var circleStyle = {
-    radius: 3,
+    radius: 6,
     fillColor: "yellow",
     color: "#000",
     weight: 1,
@@ -28,8 +28,8 @@ var circleStyle = {
     fillOpacity: 0.8
 };
 var circleStyle2 = {
-    radius: 3,
-    fillColor: "red",
+    radius: 5,
+    fillColor: "yellow",
     color: "#000",
     weight: 1,
     opacity: 1,
@@ -37,7 +37,7 @@ var circleStyle2 = {
 };
 var circleStyle3 = {
     radius: 3,
-    fillColor: "blue",
+    fillColor: "yellow",
     color: "#000",
     weight: 1,
     opacity: 1,
@@ -71,15 +71,24 @@ buildings.once("data:loaded", function(){
     points.push(points[0]);
     pointsArray.push(points);
   });
-  console.log(centerArray, pointsArray);
   for (var i = 0; i < centerArray.length; i++) {
     for (var j = 1; j < pointsArray[i].length; j++) {
       var line = L.polyline([pointsArray[i][j-1], pointsArray[i][j]]);
       var clothest = L.GeometryUtil.closest(map, line, centerArray[i]);
+    console.log(clothest.lat.toFixed(12), pointsArray[i][j-1].lat.toFixed(12), pointsArray[i][j].lat.toFixed(12));
+      if (+clothest.lat.toFixed(12) !== +pointsArray[i][j-1].lat.toFixed(12) &&
+          +clothest.lng.toFixed(12) !== +pointsArray[i][j-1].lng.toFixed(12) &&
+          +clothest.lat.toFixed(12) !== +pointsArray[i][j].lat.toFixed(12) &&
+          +clothest.lng.toFixed(12) !== +pointsArray[i][j].lng.toFixed(12)){
       L.circleMarker(clothest, circleStyle3).addTo(map);
-      // console.log(clothest);
-      // console.log(centerArray[i]);
+      var Geodesic = L.geodesic([], {
+          weight: 1.5,
+          opacity: 0.7,
+          color: 'yellow',
+          steps: 50
+      }).addTo(map);
       Geodesic.setLatLngs([[centerArray[i], clothest]]);
+    }
     }
   }
 }, buildings);
