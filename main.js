@@ -5,7 +5,7 @@ require('leaflet-ajax');
 */
 
 
-var map = L.map(document.getElementsByClassName('map')[0]).setView([55.787725, 37.631181], 16);
+var map = L.map(document.getElementsByClassName('map')[0]).setView([55.787725, 37.631181], 18);
 var basemap = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',{
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
 });
@@ -20,30 +20,41 @@ var buildingsStyle = {
 };
 var circleStyle = {
     radius: 3,
-    fillColor: "#FFFF00",
+    fillColor: "yellow",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+var circleStyle2 = {
+    radius: 3,
+    fillColor: "red",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+var circleStyle3 = {
+    radius: 3,
+    fillColor: "blue",
     color: "#000",
     weight: 1,
     opacity: 1,
     fillOpacity: 0.8
 };
 
-var llArray = [];
+var Geodesic = L.geodesic([], {
+    weight: 1.5,
+    opacity: 0.7,
+    color: 'yellow',
+    steps: 50
+}).addTo(map);
+
+var centerArray = [];
 var pointsArray = [];
 
 var buildings = new L.geoJson.ajax("https://raw.githubusercontent.com/ggolikov/lookout-gallery/master/src/buildings.geo.json", {
   onEachFeature: function(feature, layer) {
-    // var center = layer.getBounds().getCenter();
-    // var points = layer.getLatLngs();
-    // L.circleMarker(center, circleStyle).addTo(map);
-    // for (var i = 0; i < points.length; i++){
-    //   return (function(i){
-    //     return function(i) {
-    //       var clothest = L.closestOnSegment(map, center, points[i], points[i+1]);
-    //       L.circleMarker(clothest, circleStyle).addTo(map);
-    //       console.log(points[i], points[i+1]);
-    //     };
-    //   })(i);
-    // }
   },
   style: buildingsStyle,
 });
@@ -51,16 +62,23 @@ var buildings = new L.geoJson.ajax("https://raw.githubusercontent.com/ggolikov/l
 map.addLayer(buildings);
 
 buildings.once("data:loaded", function(){
-  this.eachLayer(function(feature, layer) {
+  this.eachLayer(function(feature) {
     var center = feature.getBounds().getCenter();
-    var points = feature.getLatLngs();
+    centerArray.push(center);
     L.circleMarker(center, circleStyle).addTo(map);
-    var arr = [];
-      for (var i = 0; i < points.length; i++){
-          arr.push([points[i], points[i+1]]);
-      };
-      var clothest = closestOnSegment(map, center, [56, 36], [57,37]);
-      console.log(clothest);
-        // L.circleMarker(clothest, circleStyle).addTo(map);
+    var points = feature.getLatLngs();
+    points.push(points[0]);
+    pointsArray.push(points);
   });
+  console.log(centerArray, pointsArray);
+  for (var i = 0; i < centerArray.length; i++) {
+    for (var j = 1; j < pointsArray[i].length; j++) {
+      var line = L.polyline([pointsArray[i][j-1], pointsArray[i][j]]);
+      var clothest = L.GeometryUtil.closest(map, line, centerArray[i]);
+      L.circleMarker(clothest, circleStyle3).addTo(map);
+      // console.log(clothest);
+      // console.log(centerArray[i]);
+      Geodesic.setLatLngs([[centerArray[i], clothest]]);
+    }
+  }
 }, buildings);
